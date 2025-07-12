@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PainConsulting.Inc - AIとDXでビジネスの未来を創造する</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Swiper.js for Sliders -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <!-- three.js for Hero Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Noto Sans JP', 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Slightly off-white background */
+            color: #1a202c;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .font-mincho {
+            font-family: 'Noto Serif JP', serif;
+        }
+        
+        /* Color Palette */
+        .bg-navy { background-color: #0a142f; }
+        .bg-sky { background-color: #0ea5e9; }
+        .text-navy { color: #0a142f; }
+        .text-sky { color: #0ea5e9; }
+        .border-sky { border-color: #0ea5e9; }
+
+        /* Header */
+        .header-scrolled {
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .header-scrolled .nav-link, .header-scrolled .company-name { color: #0a142f; }
+        .header-scrolled #mobile-menu-button i { color: #0a142f; }
+
+
+        /* Hero Section */
+        .hero-section {
+            position: relative;
+            background-color: #0a142f;
+            overflow: hidden;
+        }
+        #hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 1.2s cubic-bezier(0.165, 0.84, 0.44, 1), transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-fast { transition-delay: 0.2s; }
+        .reveal-medium { transition-delay: 0.4s; }
+        .reveal-slow { transition-delay: 0.6s; }
+        
+        /* Section Title */
+        .section-title::after {
+            content: ''; display: block; width: 60px; height: 4px;
+            background-color: #0ea5e9; margin: 16px auto 0; border-radius: 2px;
+        }
+        
+        /* Geometric Background Pattern */
+        .geometric-bg {
+            background-color: #ffffff;
+            background-image:
+                linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        
+        /* Swiper.js Slider Styles */
+        .swiper {
+             width: 100%;
+             height: 100%;
+             padding-bottom: 50px !important; /* Ensure space for pagination */
+        }
+
+        .swiper-slide {
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: stretch; /* Make cards in a row equal height */
+        }
+
+        .swiper-pagination-bullet-active { background-color: #0ea5e9 !important; }
+        .swiper-button-next, .swiper-button-prev { color: #0a142f !important; transform: scale(0.8); }
+        .swiper-button-next:hover, .swiper-button-prev:hover { color: #0ea5e9 !important; }
+
+
+        /* Card Styles */
+        .h-tech-card {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        box-shadow 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                        border-color 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure card takes full height of the slide */
+        }
+        .h-tech-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(14, 165, 233, 0.5);
+            box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
+        }
+
+        .case-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .case-card .img-container {
+            height: 220px;
+            overflow: hidden;
+        }
+        .case-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease-in-out;
+        }
+        .case-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Form Styling */
+        .form-input {
+            transition: border-color .3s ease;
+        }
+        .form-input:focus {
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- ===== Header Section ===== -->
+    <header id="header" class="text-white fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-xl md:text-2xl font-bold company-name transition-colors duration-300">
+                <a href="#">PainConsulting.Inc</a>
+            </div>
+            <nav class="hidden md:flex items-center space-x-6 text-sm">
+                <a href="#philosophy" class="nav-link transition-colors duration-300 hover:text-sky-400">PHILOSOPHY</a>
+                <a href="#strengths" class="nav-link transition-colors duration-300 hover:text-sky-400">STRENGTHS</a>
+                <a href="#services" class="nav-link transition-colors duration-300 hover:text-sky-400">SERVICES</a>
+                <a href="#cases" class="nav-link transition-colors duration-300 hover:text-sky-400">PROJECTS</a>
+                <a href="#company" class="nav-link transition-colors duration-300 hover:text-sky-400">COMPANY</a>
+                <a href="#contact" class="bg-sky-500 text-white px-5 py-2 rounded-full font-bold hover:bg-sky-600 transition-all shadow-md hover:shadow-lg">CONTACT</a>
+            </nav>
+            <div class="md:hidden">
+                <button id="mobile-menu-button" class="focus:outline-none"><i class="fas fa-bars fa-2x transition-colors duration-300"></i></button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden bg-navy/95 backdrop-blur-sm">
+            <a href="#philosophy" class="mobile-nav-link block text-center py-4 text-sm hover:bg-sky-500/20 transition-colors duration-200">PHILOSOPHY</a>
+            <a href="#strengths" class="mobile-nav-link block text-center py-4 text-sm hover:bg-sky-500/20 transition-colors duration-200">STRENGTHS</a>
+            <a href="#services" class="mobile-nav-link block text-center py-4 text-sm hover:bg-sky-500/20 transition-colors duration-200">SERVICES</a>
+            <a href="#cases" class="mobile-nav-link block text-center py-4 text-sm hover:bg-sky-500/20 transition-colors duration-200">PROJECTS</a>
+            <a href="#company" class="mobile-nav-link block text-center py-4 text-sm hover:bg-sky-500/20 transition-colors duration-200">COMPANY</a>
+            <a href="#contact" class="mobile-nav-link block text-center bg-sky-500 py-4 text-sm font-bold hover:bg-sky-600 transition-colors duration-200">CONTACT</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- ===== Hero Section ===== -->
+        <section class="hero-section h-screen flex items-center justify-center text-white text-center">
+            <canvas id="hero-canvas"></canvas>
+            <div class="hero-content p-4">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-6 reveal font-mincho">AIの民主化で、<br>日本の<span class="text-sky-300">生産性</span>を向上させる。</h1>
+                <p class="text-base md:text-lg max-w-3xl mx-auto mb-10 text-gray-300 reveal reveal-fast">私たちは、最先端のAI技術を誰もが利用できる形にし、<br class="hidden sm:block">日本全体の生産性向上に貢献します。</p>
+                <a href="#services" class="bg-sky-500 text-white font-bold py-4 px-10 rounded-full text-lg hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 reveal reveal-medium shadow-lg hover:shadow-sky-500/40">事業内容を見る</a>
+            </div>
+        </section>
+
+        <!-- ===== Philosophy Section ===== -->
+        <section id="philosophy" class="py-20 md:py-28 geometric-bg">
+            <div class="container mx-auto px-6 text-center relative z-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Philosophy</h2>
+                <p class="mt-12 text-xl md:text-2xl font-medium leading-relaxed max-w-4xl mx-auto reveal reveal-fast">「高い専門性」と「多角的ソリューション」で、<br class="md:hidden">DXを民主化する</p>
+                <div class="mt-12 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
+                    <div class="h-tech-card p-6 rounded-lg reveal">
+                        <div class="text-sky-500 text-3xl mb-3"><i class="fa-solid fa-lightbulb"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">ボトルネックの解消</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">表面的な問題解決に留まらず、ビジネスの根幹に潜む真のボトルネックを特定します。業務フローの徹底的な可視化とデータ分析に基づき、非効率なプロセスや構造的な課題を浮き彫りにし、持続可能な成長を可能にするための本質的なソリューションをご提案します。</p>
+                    </div>
+                    <div class="h-tech-card p-6 rounded-lg reveal reveal-medium">
+                        <div class="text-sky-500 text-3xl mb-3"><i class="fa-solid fa-people-group"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">DXの民主化</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">最先端のテクノロジーは、一部の巨大企業だけのものではありません。私たちは、AIやDXの専門知識を、あらゆる規模・業種の企業様にとって分かりやすく、導入しやすい形で提供します。真のパートナーとして伴走し、テクノロジーの恩恵をすべてのビジネスへ届けることが私たちの使命です。</p>
+                    </div>
+                    <div class="h-tech-card p-6 rounded-lg reveal reveal-slow">
+                        <div class="text-sky-500 text-3xl mb-3"><i class="fa-solid fa-handshake-angle"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">最適な人材マッチング</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">DXプロジェクトの成否は、技術だけでなく「人」に大きく左右されます。私たちは、お客様の企業文化やプロジェクトの特性を深く理解した上で、豊富なネットワークから最適なスキルとマインドセットを持つ専門人材をマッチング。チームの一員としてプロジェクトを成功に導きます。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Strengths Section ===== -->
+        <section id="strengths" class="py-20 md:py-28 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Our Strengths</h2>
+                    <p class="mt-4 text-gray-600 reveal reveal-fast">世界有数の研究実績と技術力で、お客様の課題を解決します。</p>
+                </div>
+                <div class="mt-16 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto text-center">
+                     <div class="h-tech-card p-6 rounded-lg reveal">
+                        <div class="text-sky-500 text-4xl mb-4"><i class="fas fa-cubes"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">カスタムモデル構築</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">既存APIの統合に留まらず、クライアントの課題に特化した機械学習モデルを一から設計・開発。高精度なソリューションを実現します。</p>
+                    </div>
+                     <div class="h-tech-card p-6 rounded-lg reveal reveal-medium">
+                        <div class="text-sky-500 text-4xl mb-4"><i class="fas fa-rss"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">最新情報のキャッチアップ</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">日々進化するAI技術の最先端を常に追跡。国際学会での発表や最新論文の知見を、最速でお客様のソリューションに反映します。</p>
+                    </div>
+                    <div class="h-tech-card p-6 rounded-lg reveal reveal-slow">
+                        <div class="text-sky-500 text-4xl mb-4"><i class="fas fa-server"></i></div>
+                        <h3 class="font-bold text-lg mb-2 text-navy">柔軟なインフラ対応</h3>
+                        <p class="text-gray-600 leading-relaxed text-sm">Google Cloud, AWS, Azure等のクラウドからオンプレミスまで、顧客のニーズに合わせた最適なインフラ構成を提案・構築します。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Services Section ===== -->
+        <section id="services" class="py-20 md:py-28 geometric-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Our Services</h2>
+                    <p class="mt-4 text-gray-600 reveal reveal-fast">お客様の課題に合わせた最適なソリューションをワンストップで提供します。</p>
+                </div>
+                <div class="mt-16 reveal">
+                     <div class="swiper services-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=800&auto=format&fit=crop" alt="AI・ソフトウェア開発" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <h3 class="text-xl font-bold my-2 text-navy">AI・ソフトウェア開発</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">業務自動化AIから需要予測、画像認識まで、オーダーメイドのAI・ソフトウェア開発でビジネスを加速させます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=800&auto=format&fit=crop" alt="DXコンサルティング" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <h3 class="text-xl font-bold my-2 text-navy">DXコンサルティング</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">現状分析から戦略立案、実行支援まで。お客様に寄り添い、全社的なデジタルトランスフォーメーションを成功に導きます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=800&auto=format&fit=crop" alt="AI研修" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <h3 class="text-xl font-bold my-2 text-navy">AI研修</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">全社員向けのリテラシー向上研修からエンジニア向けの専門研修まで、AIを使いこなす人材を育成します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800&auto=format&fit=crop" alt="人材採用支援" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <h3 class="text-xl font-bold my-2 text-navy">人材採用支援</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">DX、AI人材の採用に特化。独自のネットワークとノウハウで、貴社の成長を担う優秀な人材の採用を支援します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=800&auto=format&fit=crop" alt="各種マーケティング支援" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <h3 class="text-xl font-bold my-2 text-navy">各種マーケティング支援</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">データ分析に基づく戦略策定から、デジタル広告、SNS運用、コンテンツマーケティングの実行までを一気通貫で支援します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Community Section ===== -->
+        <section id="community" class="py-20 md:py-28 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Community</h2>
+                    <p class="mt-4 text-gray-600 reveal reveal-fast">多様なバックグラウンドを持つメンバーが集い、成長と挑戦の場を提供しています。</p>
+                </div>
+                <div class="mt-16 reveal">
+                    <div class="swiper community-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800&auto=format&fit=crop" alt="ShibuyaStarterBase" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">学生向け</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">ShibuyaStarterBase</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">フリーランスや起業を目指すメンバーが集う成長志向のコミュニティ。AIコンサル部、エンジニア部、営業部などの部署で実践的なスキルを磨き、仲間と協働しながらプロジェクトに挑戦できます。キャリア支援や情報交換も活発で、挑戦したい人のための最適な環境です。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal reveal-medium">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?q=80&w=800&auto=format&fit=crop" alt="ShibuyaProfessionalBase" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">フリーランス向け</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">ShibuyaProfessionalBase</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">フリーランスや起業家のための実践的なビジネスコミュニティ。案件獲得や協業の機会を提供し、メンバー同士で切磋琢磨しながらスキルアップやネットワーキング、最新情報の交換ができる場です。多様な分野のプロフェッショナルが集い、成長と挑戦を支援します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal reveal-slow">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1503676382389-4809596d5290?q=80&w=800&auto=format&fit=crop" alt="キャリア研究部~早稲田総合研究会~" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">キャリア研究部</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">学生のキャリア形成を支援するための部門。業界研究やOB・OG交流、インターンシップ情報の共有などを通じて、将来の進路選択や就職活動に役立つ知識と経験を提供します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?q=80&w=800&auto=format&fit=crop" alt="AI研究部~早稲田総合研究会~" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">AI研究部</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">AI技術やデータサイエンスに興味のある学生が集まり、勉強会やプロジェクトを通じて最先端の知識を学び、実践的なスキルを身につけることができます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?q=80&w=800&auto=format&fit=crop" alt="メディア研究部~早稲田総合研究会~" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">メディア研究部</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">メディアや広報、情報発信に関心のある学生が、記事執筆やSNS運用、イベント企画などを通じて、実践的なメディア運営スキルを身につけます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl reveal">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?q=80&w=800&auto=format&fit=crop" alt="起業部~早稲田総合研究会~" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
+                                        <h3 class="text-xl font-bold my-2 text-navy">起業部</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">起業に関心のある学生が集まり、ビジネスプランの作成やピッチイベント、起業家との交流を通じて、実践的な起業ノウハウやマインドを養います。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Projects Section ===== -->
+        <section id="cases" class="py-20 md:py-28 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Projects</h2>
+                    <p class="mt-4 text-gray-600 reveal reveal-fast">様々な業界で、課題解決と事業成長を実現しています。</p>
+                </div>
+                <div class="mt-16 reveal">
+                    <div class="swiper cases-swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide p-2">
+                                 <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=2070&auto=format&fit=crop" alt="顧客対応AI" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">ゴルフ会員権売買</span><h3 class="text-xl font-bold my-2 text-navy">顧客対応AI (メール返信AI)</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">LINEやメールでの顧客対応をAIで自動化し、営業・CS部門のコア業務への集中と業務効率化を実現しました。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                 <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2070&auto=format&fit=crop" alt="住宅内観・外観変換AI" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">大手建材メーカー</span><h3 class="text-xl font-bold my-2 text-navy">住宅内観・外観変換AI</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">リフォーム後の内装イメージをAIで即座に生成。顧客への視覚的な完成イメージ共有を促進し、提案の質を向上させました。</p>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="swiper-slide p-2">
+                                 <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?q=80&w=2070&auto=format&fit=crop" alt="AI薬機くん" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">薬機法コンサル会社</span><h3 class="text-xl font-bold my-2 text-navy">AI薬機くん</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">複雑な薬機法の広告表示規制に関する疑問を解決するチャットボットを開発。ガイドラインに準拠した適切な情報提供を実現しました。</p>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="swiper-slide p-2">
+                                 <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=2070&auto=format&fit=crop" alt="AIリスキリング教材" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">ソフトウェア開発会社</span><h3 class="text-xl font-bold my-2 text-navy">AIリスキリング教材 監修</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">社員のAIスキル向上のため、基礎から応用まで体系的に学べるリスキリング教材を監修しました。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1554224154-26032ffc0d07?q=80&w=2072&auto=format&fit=crop" alt="税理士・会計士特化型AI研修" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">税理士・会計士事務所</span><h3 class="text-xl font-bold my-2 text-navy">税理士・会計士特化型AI研修</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">会計処理の効率化、顧客データ分析、資料作成、提案の草案作成などをAIで支援し、専門業務の高度化を実現します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?q=80&w=2070&auto=format&fit=crop" alt="法律事務所特化型AI研修" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">法律事務所</span><h3 class="text-xl font-bold my-2 text-navy">法律事務所特化型AI研修</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">議事録作成、法律・判例リサーチ、資格不要業務の自動化などを通じ、弁護士がより戦略的な業務に集中できる環境を構築します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop" alt="営業職特化型AI研修" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">営業部門</span><h3 class="text-xl font-bold my-2 text-navy">営業職特化型AI研修</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">日程調整、顧客データ分析、SNS運用などをAIで効率化。営業担当者が顧客との関係構築に注力できるよう支援します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1551434678-e076c223a692?q=80&w=2070&auto=format&fit=crop" alt="生成AIコンサルティング" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">全業種対応</span><h3 class="text-xl font-bold my-2 text-navy">生成AIコンサルティング</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">最新AI情報のキャッチアップから業務への落とし込みまでを一貫してサポート。非効率な日常業務へ定期的なソリューションを提案します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- New Industry Cases Start -->
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop" alt="現場管理AI" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">建設業</span><h3 class="text-xl font-bold my-2 text-navy">現場管理AI</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">AIが工程・リスクを予測し、ドローンで品質検査を自動化。安全管理も強化し、現場の生産性を向上させます。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2070&auto=format&fit=crop" alt="物流最適化AI" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">物流業</span><h3 class="text-xl font-bold my-2 text-navy">物流最適化AI</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">AIが輸送計画や配車を最適化し、GPSで荷物を追跡。ドライバーの安全も管理し、業務の効率化と品質向上を実現します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="swiper-slide p-2">
+                                <div class="case-card h-tech-card rounded-xl">
+                                    <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop" alt="品質管理AI" class="w-full rounded-t-xl"></div>
+                                    <div class="p-8 text-left flex-grow flex flex-col">
+                                        <span class="text-sky-500 font-bold text-sm">製造業</span><h3 class="text-xl font-bold my-2 text-navy">品質管理AI</h3>
+                                        <p class="text-sm text-gray-700 flex-grow">品質検査の自動化、生産計画の最適化、ベテランの技術継承をAIで支援し、現場の生産性向上に貢献します。</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- New Industry Cases End -->
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Company Profile Section ===== -->
+        <section id="company" class="py-20 md:py-28 geometric-bg">
+            <div class="container mx-auto px-6">
+                <div class="text-center"><h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Company Profile</h2></div>
+                <div class="max-w-4xl mx-auto mt-16 bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-gray-200 shadow-sm reveal reveal-fast">
+                    <dl class="text-sm md:text-base">
+                        <div class="py-5 flex flex-col md:flex-row border-b border-gray-200"><dt class="font-bold w-full md:w-1/4 mb-1 md:mb-0 text-navy">会社名</dt><dd class="w-full md:w-3/4">株式会社PainConsulting</dd></div>
+                        <div class="py-5 flex flex-col md:flex-row border-b border-gray-200"><dt class="font-bold w-full md:w-1/4 mb-1 md:mb-0 text-navy">代表者</dt><dd class="w-full md:w-3/4">代表取締役 横溝 匠</dd></div>
+                        <div class="py-5 flex flex-col md:flex-row border-b border-gray-200"><dt class="font-bold w-full md:w-1/4 mb-1 md:mb-0 text-navy">事業内容</dt><dd class="w-full md:w-3/4">AI開発, DXコンサルティング, AI研修, 人材採用, マーケティング支援</dd></div>
+                        <div class="py-5 flex flex-col md:flex-row"><dt class="font-bold w-full md:w-1/4 mb-1 md:mb-0 text-navy">お問い合わせ</dt><dd class="w-full md:w-3/4"><p><i class="fa-solid fa-envelope w-5 mr-1 text-sky-500"></i> <a href="mailto:yokomizo.nitro@gmail.com" class="hover:text-sky-500 transition-colors">yokomizo.nitro@gmail.com</a></p><p class="mt-2"><i class="fa-solid fa-phone w-5 mr-1 text-sky-500"></i> <a href="tel:07089074730" class="hover:text-sky-500 transition-colors">070-8907-4730</a></p></dd></div>
+                    </dl>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== Contact Form Section ===== -->
+        <section id="contact" class="py-20 md:py-28 bg-navy text-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-4xl font-bold section-title reveal">Contact Us</h2>
+                    <p class="mt-4 text-gray-300 max-w-2xl mx-auto reveal reveal-fast">まずはお気軽にご相談ください。お客様のビジネスに最適なソリューションをご提案します。</p>
+                </div>
+                <div class="max-w-2xl mx-auto mt-12 reveal reveal-medium">
+                    <form id="contact-form">
+                        <div id="form-result" class="hidden mb-6 p-4 rounded-md text-center"></div>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">お名前</label>
+                                <input type="text" id="name" name="name" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                             <div>
+                                <label for="company_name" class="block text-sm font-medium text-gray-300 mb-2">会社名</label>
+                                <input type="text" id="company_name" name="company_name" class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                             <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">電話番号</label>
+                                <input type="tel" id="phone" name="phone" class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">メールアドレス</label>
+                                <input type="email" id="email" name="email" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-300 mb-2">お問い合わせ内容</label>
+                                <textarea id="message" name="message" rows="6" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-8 text-center">
+                            <button type="submit" class="bg-sky-500 text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-sky-500/40">
+                                送信する
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===== Footer Section ===== -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-6"><p class="font-bold text-lg text-white">株式会社PainConsulting</p></div>
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="https://www.instagram.com/mizonokuchi__029?igsh=cHlsOHJ3bGh3c2hu&utm_source=qr" target="_blank" class="text-2xl hover:text-sky-400 transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.facebook.com/share/1Hmc62fJT2/?mibextid=wwXIfr" target="_blank" class="text-2xl hover:text-sky-400 transition-colors"><i class="fa-brands fa-facebook"></i></a>
+            </div>
+            <p class="text-sm">&copy; 2024 株式会社PainConsulting. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- Mobile Menu Functionality ---
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuIcon = mobileMenuButton.querySelector('i');
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                const isHidden = mobileMenu.classList.contains('hidden');
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuIcon.classList.toggle('fa-bars', !isHidden);
+                mobileMenuIcon.classList.toggle('fa-times', isHidden);
+            });
+            
+            function smoothScrollTo(targetId) {
+                 const targetElement = document.querySelector(targetId);
+                 if (targetElement) {
+                     targetElement.scrollIntoView({ behavior: 'smooth' });
+                 }
+            }
+
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetId = link.getAttribute('href');
+                    if (targetId.startsWith('#')) {
+                        e.preventDefault();
+                        smoothScrollTo(targetId);
+                    }
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuIcon.classList.remove('fa-times');
+                    mobileMenuIcon.classList.add('fa-bars');
+                });
+            });
+
+            // Smooth scroll for desktop nav links
+            document.querySelectorAll('header nav a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    smoothScrollTo(this.getAttribute('href'));
+                });
+            });
+
+
+            // --- Header Scroll Effect ---
+            const header = document.getElementById('header');
+            const mobileMenuButtonIcon = document.getElementById('mobile-menu-button').querySelector('i');
+
+            const handleHeaderScroll = () => {
+                const scrolled = window.scrollY > 50;
+                header.classList.toggle('header-scrolled', scrolled);
+                // Also change the mobile menu icon color if the header is scrolled but the menu is not open
+                if (!mobileMenu.classList.contains('hidden')) return;
+                mobileMenuButtonIcon.style.color = scrolled ? '#0a142f' : 'white';
+            };
+            window.addEventListener('scroll', handleHeaderScroll);
+            handleHeaderScroll();
+
+            // --- Scroll Reveal Animation ---
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+            
+            // --- Hero Animation (three.js) ---
+            let scene, camera, renderer, particles, lines;
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                 function initHeroAnimation() {
+                    scene = new THREE.Scene();
+                    camera = new THREE.PerspectiveCamera(75, heroSection.offsetWidth / heroSection.offsetHeight, 0.1, 1000);
+                    renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('hero-canvas'), alpha: true });
+                    renderer.setSize(heroSection.offsetWidth, heroSection.offsetHeight);
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+                    const points = [];
+                    const numPoints = window.innerWidth < 768 ? 150 : 300;
+                    for (let i = 0; i < numPoints; i++) {
+                        const x = THREE.MathUtils.randFloatSpread(200);
+                        const y = THREE.MathUtils.randFloatSpread(200);
+                        const z = THREE.MathUtils.randFloatSpread(-200, 50);
+                        points.push(new THREE.Vector3(x, y, z));
+                    }
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const material = new THREE.PointsMaterial({ 
+                        color: 0x0ea5e9, 
+                        size: 1.5, 
+                        transparent: true, 
+                        opacity: 0.4,
+                        blending: THREE.AdditiveBlending 
+                    });
+                    particles = new THREE.Points(geometry, material);
+                    scene.add(particles);
+
+                    camera.position.z = 100;
+                }
+
+                const mouse = new THREE.Vector2();
+                function onMouseMove(event) {
+                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                }
+                window.addEventListener('mousemove', onMouseMove);
+                
+                const clock = new THREE.Clock();
+                function animate() {
+                    if (!renderer) return;
+                    requestAnimationFrame(animate);
+
+                    const elapsedTime = clock.getElapsedTime();
+                    particles.rotation.y = elapsedTime * 0.05;
+
+                    camera.position.x += (mouse.x * 15 - camera.position.x) * 0.03;
+                    camera.position.y += (-mouse.y * 15 - camera.position.y) * 0.03;
+                    camera.lookAt(scene.position);
+
+                    renderer.render(scene, camera);
+                }
+
+                function onResize() {
+                    if (!renderer) return;
+                    camera.aspect = heroSection.offsetWidth / heroSection.offsetHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(heroSection.offsetWidth, heroSection.offsetHeight);
+                    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+                }
+                window.addEventListener('resize', onResize);
+
+                initHeroAnimation();
+                animate();
+            }
+
+            // --- Contact Form Submission ---
+            const contactForm = document.getElementById('contact-form');
+            const formResult = document.getElementById('form-result');
+            if(contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // NOTE: This is a front-end only simulation.
+                    // For a real application, you would send the data to a server here.
+                    formResult.classList.remove('hidden', 'bg-red-200', 'text-red-800');
+                    formResult.classList.add('bg-green-200', 'text-green-800');
+                    formResult.textContent = 'お問い合わせありがとうございます。メッセージが送信されました。';
+                    formResult.style.display = 'block';
+
+                    contactForm.reset();
+
+                    setTimeout(() => {
+                         formResult.style.display = 'none';
+                    }, 5000);
+                });
+            }
+
+
+            // --- Swiper.js Initialization ---
+            const servicesSwiper = new Swiper('.services-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: { el: '.swiper-pagination', clickable: true },
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                breakpoints: {
+                    768: { slidesPerView: 2, spaceBetween: 25 },
+                    1024: { slidesPerView: 3, spaceBetween: 30 },
+                },
+                 autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+            });
+
+            const casesSwiper = new Swiper('.cases-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: { el: '.swiper-pagination', clickable: true },
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                 breakpoints: {
+                    640: { slidesPerView: 2, spaceBetween: 25 },
+                    1024: { slidesPerView: 3, spaceBetween: 30 },
+                },
+                autoplay: {
+                    delay: 4500,
+                    disableOnInteraction: false,
+                },
+            });
+
+            const communitySwiper = new Swiper('.community-swiper', {
+                loop: true,
+                slidesPerView: 1,
+                spaceBetween: 20,
+                pagination: { el: '.swiper-pagination', clickable: true },
+                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+                breakpoints: {
+                    768: { slidesPerView: 2, spaceBetween: 25 },
+                    1024: { slidesPerView: 3, spaceBetween: 30 },
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+            });
+        });
+    </script>
+</body>
+</html>
