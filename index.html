@@ -17,6 +17,8 @@
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- three.js for Hero Animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- highlight.js (for code blocks in Markdown) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
 
     <style>
         /* Custom Styles */
@@ -197,6 +199,16 @@
         .training-md-content table { width:100%; border-collapse: collapse; margin: 0.75em 0; }
         .training-md-content th, .training-md-content td { border:1px solid #e2e8f0; padding:8px 10px; }
         .training-md-content th { background:#f8fafc; text-align:left; }
+        .training-md-content tr:nth-child(even) { background:#f9fafb; }
+        .training-md-content a { color:#0369a1; text-decoration: underline; text-underline-offset: 2px; }
+        .training-md-content a:hover { color:#0ea5e9; }
+        .training-md-content blockquote { border-left:4px solid #0ea5e9; background:#f0f9ff; padding:12px 16px; border-radius:8px; margin: 0.75em 0; color:#0f172a; }
+        .training-md-content hr { border:0; border-top:1px solid #e2e8f0; margin: 1.25rem 0; }
+        .training-md-content img { max-width:100%; height:auto; border-radius:10px; box-shadow: 0 8px 24px rgba(2,6,23,0.12); margin: 0.5rem 0; }
+        .training-md-content pre { overflow-x:auto; border-radius:10px; border:1px solid #e2e8f0; }
+        /* Fade-in for loaded content */
+        .training-md-content { animation: mdFadeIn 220ms ease; }
+        @keyframes mdFadeIn { from { opacity:0; transform: translateY(4px);} to { opacity:1; transform: translateY(0);} }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -812,10 +824,38 @@
                     if (window.marked) return resolve(window.marked);
                     const s = document.createElement('script');
                     s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
-                    s.onload = () => resolve(window.marked);
+                    s.onload = () => {
+                        try {
+                            window.marked.setOptions({ gfm: true, breaks: true, headerIds: true, mangle: false, smartypants: true });
+                        } catch (e) {}
+                        resolve(window.marked);
+                    };
                     s.onerror = reject;
                     document.head.appendChild(s);
                 });
+            }
+
+            function loadHLJS() {
+                return new Promise((resolve, reject) => {
+                    if (window.hljs) return resolve(window.hljs);
+                    const s = document.createElement('script');
+                    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';
+                    s.onload = () => resolve(window.hljs);
+                    s.onerror = reject;
+                    document.head.appendChild(s);
+                });
+            }
+
+            function postProcessMarkdown(container) {
+                // External links
+                container.querySelectorAll('a').forEach(a => {
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                });
+                // Syntax highlight
+                if (window.hljs) {
+                    container.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+                }
             }
 
             const mdDetails = Array.from(document.querySelectorAll('#training-modal details[data-md-path]'));
@@ -829,7 +869,9 @@
                         const res = await fetch(path);
                         const text = await res.text();
                         await loadMarked();
+                        await loadHLJS();
                         container.innerHTML = window.marked.parse(text);
+                        postProcessMarkdown(container);
                         d.dataset.loaded = '1';
                     } catch (err) {
                         container.innerHTML = '<p class="text-red-600">読み込みに失敗しました。</p>';
