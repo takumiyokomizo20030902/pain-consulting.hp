@@ -467,36 +467,11 @@
                     <p class="mt-4 text-gray-300 max-w-2xl mx-auto reveal reveal-fast">まずはお気軽にご相談ください。お客様のビジネスに最適なソリューションをご提案します。</p>
                 </div>
                 <div class="max-w-2xl mx-auto mt-12 reveal reveal-medium">
-                    <form id="contact-form">
-                        <div id="form-result" class="hidden mb-6 p-4 rounded-md text-center"></div>
-                        <div class="space-y-6">
-                            <div>
-                                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">お名前</label>
-                                <input type="text" id="name" name="name" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                             <div>
-                                <label for="company_name" class="block text-sm font-medium text-gray-300 mb-2">会社名</label>
-                                <input type="text" id="company_name" name="company_name" class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                             <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-300 mb-2">電話番号</label>
-                                <input type="tel" id="phone" name="phone" class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-300 mb-2">メールアドレス</label>
-                                <input type="email" id="email" name="email" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500">
-                            </div>
-                            <div>
-                                <label for="message" class="block text-sm font-medium text-gray-300 mb-2">お問い合わせ内容</label>
-                                <textarea id="message" name="message" rows="6" required class="form-input block w-full px-4 py-3 rounded-md bg-gray-800 border-gray-700 text-white focus:ring-sky-500 focus:border-sky-500"></textarea>
-                            </div>
-                        </div>
-                        <div class="mt-8 text-center">
-                            <button type="submit" class="bg-sky-500 text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-sky-500/40">
-                                送信する
-                            </button>
-                        </div>
-                    </form>
+                    <div class="bg-gray-800/60 border border-gray-700 rounded-xl p-8 text-center">
+                        <a href="https://forms.gle/hcGuiAyvWETQinbX8" target="_blank" rel="noopener" class="inline-block bg-sky-500 text-white font-bold py-3 px-10 rounded-full text-lg hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-sky-500/40">
+                            お問い合わせはこちら
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -651,26 +626,7 @@
                 animate();
             }
 
-            // --- Contact Form Submission ---
-            const contactForm = document.getElementById('contact-form');
-            const formResult = document.getElementById('form-result');
-            if(contactForm) {
-                contactForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    // NOTE: This is a front-end only simulation.
-                    // For a real application, you would send the data to a server here.
-                    formResult.classList.remove('hidden', 'bg-red-200', 'text-red-800');
-                    formResult.classList.add('bg-green-200', 'text-green-800');
-                    formResult.textContent = 'お問い合わせありがとうございます。メッセージが送信されました。';
-                    formResult.style.display = 'block';
-
-                    contactForm.reset();
-
-                    setTimeout(() => {
-                         formResult.style.display = 'none';
-                    }, 5000);
-                });
-            }
+            // Contact form removed; Google Form is used instead.
 
 
             // --- Swiper.js Initialization ---
