@@ -165,6 +165,38 @@
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
             outline: none;
         }
+
+        /* Training modal transitions */
+        #training-modal-backdrop { opacity: 0; transition: opacity 200ms ease; }
+        #training-modal.is-open #training-modal-backdrop { opacity: 1; }
+        #training-modal-panel { opacity: 0; transform: translateY(10px) scale(0.98); transition: opacity 220ms ease, transform 220ms ease; }
+        #training-modal.is-open #training-modal-panel { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Toggle (details/summary) styling */
+        details.toggle-card { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
+        details.toggle-card + details.toggle-card { margin-top: 14px; }
+        details.toggle-card[open] { box-shadow: 0 10px 24px rgba(2,6,23,0.08); border-color: #cbd5e1; }
+        summary.toggle-summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); }
+        summary.toggle-summary::-webkit-details-marker { display: none; }
+        .ts-left { display:flex; align-items:center; gap:12px; min-width:0; }
+        .ts-title { color:#0a142f; font-weight: 700; }
+        .ts-sub { color:#475569; font-size: 12px; font-weight:600; background:#e2e8f0; padding:2px 8px; border-radius:999px; }
+        .ts-right { display:flex; align-items:center; gap:10px; }
+        .ts-badge { font-size: 11px; font-weight:700; color:#0369a1; background:#e0f2fe; border:1px solid #bae6fd; padding:4px 8px; border-radius:999px; }
+        .ts-chevron { transition: transform 200ms ease, color 200ms ease; color:#64748b; }
+        details[open] .ts-chevron { transform: rotate(180deg); color:#0ea5e9; }
+        .training-md-content { line-height: 1.7; color:#0f172a; }
+        .training-md-content h1, .training-md-content h2, .training-md-content h3 { color:#0a142f; margin: 1.2em 0 0.5em; font-weight:800; }
+        .training-md-content h1 { font-size:1.5rem; }
+        .training-md-content h2 { font-size:1.25rem; }
+        .training-md-content h3 { font-size:1.125rem; }
+        .training-md-content p { margin: 0.5em 0; }
+        .training-md-content ul { margin: 0.5em 0 0.5em 1.2em; list-style: disc; }
+        .training-md-content ol { margin: 0.5em 0 0.5em 1.2em; list-style: decimal; }
+        .training-md-content code { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.9em; }
+        .training-md-content table { width:100%; border-collapse: collapse; margin: 0.75em 0; }
+        .training-md-content th, .training-md-content td { border:1px solid #e2e8f0; padding:8px 10px; }
+        .training-md-content th { background:#f8fafc; text-align:left; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -484,26 +516,66 @@
         <div id="training-modal" class="fixed inset-0 hidden" aria-hidden="true">
             <div id="training-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
             <div class="absolute inset-0 flex items-center justify-center p-4">
-                <div class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
+                <div id="training-modal-panel" class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
                     <div class="flex items-center justify-between px-6 py-4 border-b">
                         <h3 class="text-lg md:text-xl font-bold text-navy">AI研修の詳細</h3>
                         <button type="button" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" data-close-training-modal aria-label="閉じる">×</button>
                     </div>
                     <div class="p-6 space-y-4">
-                        <details class="border rounded-lg" data-md-path="kensyu-ai-business.md">
-                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">AIビジネス基礎</summary>
+                        <details class="toggle-card" data-md-path="kensyu-ai-business.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-sky-600"><i class="fa-solid fa-briefcase"></i></span>
+                                    <span class="ts-title">AIビジネス基礎</span>
+                                    <span class="ts-sub">基礎〜応用</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">3h〜</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
                             <div class="p-4 training-md-content"></div>
                         </details>
-                        <details class="border rounded-lg" data-md-path="kensyu-copilot.md">
-                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">GitHub Copilot活用</summary>
+                        <details class="toggle-card" data-md-path="kensyu-copilot.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-indigo-600"><i class="fa-solid fa-code"></i></span>
+                                    <span class="ts-title">GitHub Copilot活用</span>
+                                    <span class="ts-sub">開発効率化</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">実践</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
                             <div class="p-4 training-md-content"></div>
                         </details>
-                        <details class="border rounded-lg" data-md-path="kensyu-notion.md">
-                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">Notion AI活用</summary>
+                        <details class="toggle-card" data-md-path="kensyu-notion.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-emerald-600"><i class="fa-solid fa-note-sticky"></i></span>
+                                    <span class="ts-title">Notion AI活用</span>
+                                    <span class="ts-sub">ナレッジ管理</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">部門横断</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
                             <div class="p-4 training-md-content"></div>
                         </details>
-                        <details class="border rounded-lg" data-md-path="kensyu-google-workspace-ai.md">
-                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">Google Workspace AI活用</summary>
+                        <details class="toggle-card" data-md-path="kensyu-google-workspace-ai.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-amber-600"><i class="fa-solid fa-envelope-open-text"></i></span>
+                                    <span class="ts-title">Google Workspace AI活用</span>
+                                    <span class="ts-sub">Docs/Sheets/Slides</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">全社向け</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
                             <div class="p-4 training-md-content"></div>
                         </details>
                     </div>
@@ -705,13 +777,20 @@
             function openTrainingModal() {
                 if (!trainingModal) return;
                 trainingModal.classList.remove('hidden');
+                // allow next frame for transitions
+                requestAnimationFrame(() => trainingModal.classList.add('is-open'));
                 document.body.style.overflow = 'hidden';
             }
 
             function closeTrainingModal() {
                 if (!trainingModal) return;
-                trainingModal.classList.add('hidden');
-                document.body.style.overflow = '';
+                trainingModal.classList.remove('is-open');
+                const onEnd = () => {
+                    trainingModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    trainingModal.removeEventListener('transitionend', onEnd);
+                };
+                trainingModal.addEventListener('transitionend', onEnd);
             }
 
             if (openTrainingBtn) {
