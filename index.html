@@ -242,6 +242,17 @@
         .training-md-content > ol > li h2,
         .training-md-content > ol > li h3 { margin-top: 0; }
         .training-md-content > ol > li ul { margin-left: 1rem; }
+
+        /* Auto-generated training cards (from plain paragraphs) */
+        .training-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; box-shadow: 0 8px 22px rgba(2,6,23,0.08); padding: 16px; margin: 14px 0; }
+        .training-card .tc-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+        .training-card .tc-title { font-weight:800; color:#0a142f; display:flex; align-items:center; gap:10px; }
+        .training-card .tc-num { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#0ea5e9; color:#fff; font-weight:800; box-shadow: 0 6px 16px rgba(14,165,233,0.35); }
+        .training-card .tc-meta { display:flex; align-items:center; gap:8px; }
+        .training-card .tc-badge { font-size:12px; font-weight:700; padding:4px 8px; border-radius:9999px; border:1px solid #bae6fd; background:#e0f2fe; color:#0369a1; white-space:nowrap; }
+        .training-card .tc-desc { color:#334155; margin: 6px 0 10px; }
+        .training-card .tc-list { margin: 8px 0 4px 0; padding-left: 1.1rem; }
+        .training-card .tc-list li { list-style: disc; margin: 6px 0; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -879,6 +890,126 @@
                 });
             }
 
+            function parseDurationStr(s) {
+                // Accept patterns like "1時間20分", "2時間", "45分", "1.5時間"
+                const m = s.trim().match(/^(?:(\d+(?:\.\d+)?)\s*時間)?\s*(\d+)?\s*分?$/);
+                if (!m) return null;
+                let hours = m[1] ? parseFloat(m[1]) : 0;
+                let minutes = m[2] ? parseInt(m[2], 10) : 0;
+                // Convert decimal hours to mins if provided
+                if (m[1] && String(m[1]).includes('.')) {
+                    minutes += Math.round((hours - Math.trunc(hours)) * 60);
+                    hours = Math.trunc(hours);
+                }
+                return { hours, minutes };
+            }
+
+            function fmtDuration(totalMin) {
+                const h = Math.floor(totalMin / 60);
+                const m = totalMin % 60;
+                if (h && m) return `${h}時間${m}分`;
+                if (h) return `${h}時間`;
+                return `${m}分`;
+            }
+
+            function autoBuildTrainingCards(container) {
+                // Build structured cards from paragraph-only content.
+                const paras = Array.from(container.querySelectorAll(':scope > p'));
+                if (paras.length < 3) return; // not our structure
+
+                const isNumberLine = (t) => /^\s*\d+\s*$/.test(t);
+                const isDurationLine = (t) => !!parseDurationStr(t);
+
+                const cards = [];
+                let i = 0; let seq = 0;
+                while (i < paras.length) {
+                    // find the start: number line or anything if first
+                    if (cards.length === 0 && !isNumberLine(paras[i].textContent)) {
+                        // start from beginning
+                    } else if (isNumberLine(paras[i].textContent)) {
+                        i++; // consume number line; number badge will come from count
+                    }
+                    seq += 1;
+                    // title
+                    if (i >= paras.length) break;
+                    const title = paras[i].textContent.trim();
+                    i++;
+                    // optional duration as next paragraph
+                    let totalMin = 0;
+                    if (i < paras.length && isDurationLine(paras[i].textContent)) {
+                        const d = parseDurationStr(paras[i].textContent);
+                        totalMin += (d.hours * 60 + d.minutes);
+                        i++;
+                    }
+                    // optional intro/desc if next para is not number or duration
+                    const bullets = [];
+                    let desc = '';
+                    while (i < paras.length && !isNumberLine(paras[i].textContent)) {
+                        const t = paras[i].textContent.trim();
+                        if (!t) { i++; continue; }
+                        const dur = parseDurationStr(t);
+                        if (dur) {
+                            totalMin += (dur.hours * 60 + dur.minutes);
+                        } else if (!desc) {
+                            // first non-duration line after title/duration → description
+                            desc = t;
+                        } else {
+                            bullets.push(t);
+                        }
+                        i++;
+                        // stop when next is number (start of next card) or we hit a heading element ahead
+                        if (i < paras.length && isNumberLine(paras[i].textContent)) break;
+                    }
+                    cards.push({ seq, title, desc, totalMin, bullets });
+                    // if next line is number, the while condition will break and continue
+                }
+
+                if (!cards.length) return;
+                // Clear and rebuild
+                container.innerHTML = '';
+                cards.forEach(c => {
+                    const card = document.createElement('div');
+                    card.className = 'training-card';
+                    const head = document.createElement('div');
+                    head.className = 'tc-head';
+                    const left = document.createElement('div');
+                    left.className = 'tc-title';
+                    const num = document.createElement('span');
+                    num.className = 'tc-num';
+                    num.textContent = c.seq;
+                    const title = document.createElement('span');
+                    title.textContent = c.title;
+                    left.appendChild(num);
+                    left.appendChild(title);
+                    head.appendChild(left);
+
+                    const meta = document.createElement('div');
+                    meta.className = 'tc-meta';
+                    if (c.totalMin) {
+                        const b = document.createElement('span');
+                        b.className = 'tc-badge';
+                        b.textContent = `標準学習時間 ${fmtDuration(c.totalMin)}`;
+                        meta.appendChild(b);
+                    }
+                    head.appendChild(meta);
+                    card.appendChild(head);
+
+                    if (c.desc) {
+                        const d = document.createElement('p');
+                        d.className = 'tc-desc';
+                        d.textContent = c.desc;
+                        card.appendChild(d);
+                    }
+                    if (c.bullets.length) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'tc-list';
+                        c.bullets.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+                        card.appendChild(ul);
+                    }
+                    container.appendChild(card);
+                });
+            }
+
             function postProcessMarkdown(container) {
                 // External links
                 container.querySelectorAll('a').forEach(a => {
@@ -889,6 +1020,8 @@
                 if (window.hljs) {
                     container.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
                 }
+                // Transform plain-paragraph training outlines into rich cards
+                autoBuildTrainingCards(container);
             }
 
             const mdDetails = Array.from(document.querySelectorAll('#training-modal details[data-md-path]'));
