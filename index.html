@@ -187,7 +187,7 @@
         .ts-badge { font-size: 11px; font-weight:700; color:#0369a1; background:#e0f2fe; border:1px solid #bae6fd; padding:4px 8px; border-radius:999px; }
         .ts-chevron { transition: transform 200ms ease, color 200ms ease; color:#64748b; }
         details[open] .ts-chevron { transform: rotate(180deg); color:#0ea5e9; }
-        .training-md-content { line-height: 1.7; color:#0f172a; }
+        .training-md-content { line-height: 1.7; color:#334155; }
         .training-md-content h1, .training-md-content h2, .training-md-content h3 { color:#0a142f; margin: 1.2em 0 0.5em; font-weight:800; }
         .training-md-content h1 { font-size:1.5rem; }
         .training-md-content h2 { font-size:1.25rem; }
@@ -209,6 +209,39 @@
         /* Fade-in for loaded content */
         .training-md-content { animation: mdFadeIn 220ms ease; }
         @keyframes mdFadeIn { from { opacity:0; transform: translateY(4px);} to { opacity:1; transform: translateY(0);} }
+
+        /* Card style for top-level numbered items */
+        .training-md-content > ol { counter-reset: item; margin: 0.75em 0; padding-left: 0; }
+        .training-md-content > ol > li {
+            list-style: none;
+            counter-increment: item;
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 16px 16px 64px;
+            margin: 12px 0;
+            box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+        }
+        .training-md-content > ol > li::before {
+            content: counter(item);
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            width: 36px; height: 36px;
+            border-radius: 9999px;
+            background: #0ea5e9;
+            color: #fff;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(14,165,233,0.35);
+        }
+        .training-md-content > ol > li h1,
+        .training-md-content > ol > li h2,
+        .training-md-content > ol > li h3 { margin-top: 0; }
+        .training-md-content > ol > li ul { margin-left: 1rem; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -542,7 +575,7 @@
                                     <span class="ts-sub">基礎〜応用</span>
                                 </span>
                                 <span class="ts-right">
-                                    <span class="ts-badge">3h〜</span>
+                                    <span class="ts-badge">標準学生時間12h</span>
                                     <i class="fa-solid fa-chevron-down ts-chevron"></i>
                                 </span>
                             </summary>
@@ -556,7 +589,7 @@
                                     <span class="ts-sub">開発効率化</span>
                                 </span>
                                 <span class="ts-right">
-                                    <span class="ts-badge">実践</span>
+                                    <span class="ts-badge">標準学生時間5h</span>
                                     <i class="fa-solid fa-chevron-down ts-chevron"></i>
                                 </span>
                             </summary>
@@ -570,7 +603,7 @@
                                     <span class="ts-sub">ナレッジ管理</span>
                                 </span>
                                 <span class="ts-right">
-                                    <span class="ts-badge">部門横断</span>
+                                    <span class="ts-badge">標準学生時間5h</span>
                                     <i class="fa-solid fa-chevron-down ts-chevron"></i>
                                 </span>
                             </summary>
@@ -584,7 +617,7 @@
                                     <span class="ts-sub">Docs/Sheets/Slides</span>
                                 </span>
                                 <span class="ts-right">
-                                    <span class="ts-badge">全社向け</span>
+                                    <span class="ts-badge">標準学生時間5h</span>
                                     <i class="fa-solid fa-chevron-down ts-chevron"></i>
                                 </span>
                             </summary>
