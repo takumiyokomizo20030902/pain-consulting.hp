@@ -323,70 +323,7 @@
             </div>
         </section>
 
-        <!-- ===== Community Section ===== -->
-        <section id="community" class="py-20 md:py-28 bg-gray-100">
-            <div class="container mx-auto px-6">
-                <div class="text-center">
-                    <h2 class="text-3xl md:text-4xl font-bold text-navy section-title reveal">Community</h2>
-                </div>
-                <div class="mt-16 reveal">
-                    <div class="swiper community-swiper">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">学生向け</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">ShibuyaStarterBase</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal reveal-medium">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">フリーランス向け</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">ShibuyaProfessionalBase</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal reveal-slow">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">キャリア研究部</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">AI研究部</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">メディア研究部</h3>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="swiper-slide p-2">
-                                <div class="case-card h-tech-card rounded-xl reveal">
-                                    <div class="p-8 text-left flex-grow flex flex-col">
-                                        <span class="text-sky-500 font-bold text-sm">早稲田総合研究会</span>
-                                        <h3 class="text-xl font-bold my-2 text-navy">起業部</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="swiper-pagination"></div>
-                        <div class="swiper-button-next"></div><div class="swiper-button-prev"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        
 
         <!-- ===== Projects Section ===== -->
         <section id="cases" class="py-20 md:py-28 bg-gray-100">
@@ -769,21 +706,7 @@
                 },
             });
 
-            const communitySwiper = new Swiper('.community-swiper', {
-                loop: true,
-                slidesPerView: 1,
-                spaceBetween: 20,
-                pagination: { el: '.swiper-pagination', clickable: true },
-                navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-                breakpoints: {
-                    768: { slidesPerView: 2, spaceBetween: 25 },
-                    1024: { slidesPerView: 3, spaceBetween: 30 },
-                },
-                autoplay: {
-                    delay: 5000,
-                    disableOnInteraction: false,
-                },
-            });
+            
         });
     </script>
 </body>
