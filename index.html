@@ -293,7 +293,10 @@
                                     <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=800&auto=format&fit=crop" alt="AI研修" class="w-full rounded-t-xl"></div>
                                     <div class="p-8 text-left flex-grow flex flex-col">
                                         <h3 class="text-xl font-bold my-2 text-navy">AI研修</h3>
-                                        <p class="text-sm text-gray-700 flex-grow">全社員向けのリテラシー向上研修からエンジニア向けの専門研修まで、AIを使いこなす人材を育成します。</p>
+                                        <p class="text-sm text-gray-700">全社員向けのリテラシー向上研修からエンジニア向けの専門研修まで、AIを使いこなす人材を育成します。</p>
+                                        <div class="mt-4">
+                                            <button id="open-training-modal" class="bg-sky-500 text-white font-bold py-2.5 px-6 rounded-full text-sm hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-sky-500/40">詳細はこちら</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -476,6 +479,37 @@
             </div>
         </section>
     </main>
+
+        <!-- ===== AI Training Modal ===== -->
+        <div id="training-modal" class="fixed inset-0 hidden" aria-hidden="true">
+            <div id="training-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
+            <div class="absolute inset-0 flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h3 class="text-lg md:text-xl font-bold text-navy">AI研修の詳細</h3>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" data-close-training-modal aria-label="閉じる">×</button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <details class="border rounded-lg" data-md-path="kensyu-ai-business.md">
+                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">AIビジネス基礎</summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="border rounded-lg" data-md-path="kensyu-copilot.md">
+                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">GitHub Copilot活用</summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="border rounded-lg" data-md-path="kensyu-notion.md">
+                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">Notion AI活用</summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="border rounded-lg" data-md-path="kensyu-google-workspace-ai.md">
+                            <summary class="cursor-pointer select-none px-4 py-3 font-bold text-navy bg-gray-50 hover:bg-gray-100 rounded-lg">Google Workspace AI活用</summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- ===== Footer Section ===== -->
     <footer class="bg-gray-900 text-gray-400 py-12">
@@ -662,7 +696,67 @@
                 },
             });
 
-            
+            // --- AI Training Modal ---
+            const trainingModal = document.getElementById('training-modal');
+            const openTrainingBtn = document.getElementById('open-training-modal');
+            const closeTrainingBtn = trainingModal ? trainingModal.querySelector('[data-close-training-modal]') : null;
+            const trainingBackdrop = document.getElementById('training-modal-backdrop');
+
+            function openTrainingModal() {
+                if (!trainingModal) return;
+                trainingModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeTrainingModal() {
+                if (!trainingModal) return;
+                trainingModal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+
+            if (openTrainingBtn) {
+                openTrainingBtn.addEventListener('click', openTrainingModal);
+            }
+            if (closeTrainingBtn) {
+                closeTrainingBtn.addEventListener('click', closeTrainingModal);
+            }
+            if (trainingBackdrop) {
+                trainingBackdrop.addEventListener('click', closeTrainingModal);
+            }
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeTrainingModal();
+            });
+
+            // Lazy-load and render Markdown on first expand
+            function loadMarked() {
+                return new Promise((resolve, reject) => {
+                    if (window.marked) return resolve(window.marked);
+                    const s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                    s.onload = () => resolve(window.marked);
+                    s.onerror = reject;
+                    document.head.appendChild(s);
+                });
+            }
+
+            const mdDetails = Array.from(document.querySelectorAll('#training-modal details[data-md-path]'));
+            mdDetails.forEach((d) => {
+                d.addEventListener('toggle', async () => {
+                    if (!d.open || d.dataset.loaded) return;
+                    const path = d.getAttribute('data-md-path');
+                    const container = d.querySelector('.training-md-content');
+                    if (!path || !container) return;
+                    try {
+                        const res = await fetch(path);
+                        const text = await res.text();
+                        await loadMarked();
+                        container.innerHTML = window.marked.parse(text);
+                        d.dataset.loaded = '1';
+                    } catch (err) {
+                        container.innerHTML = '<p class="text-red-600">読み込みに失敗しました。</p>';
+                    }
+                });
+            });
         });
     </script>
 </body>
