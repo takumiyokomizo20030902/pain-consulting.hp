@@ -171,8 +171,21 @@
         /* Training modal transitions */
         #training-modal-backdrop { opacity: 0; transition: opacity 200ms ease; }
         #training-modal.is-open #training-modal-backdrop { opacity: 1; }
-        #training-modal-panel { opacity: 0; transform: translateY(10px) scale(0.98); transition: opacity 220ms ease, transform 220ms ease; }
+        #training-modal-panel { opacity: 0; transform: translateY(10px) scale(0.98); transition: opacity 220ms ease, transform 220ms ease; width: 100%; max-width: 48rem; max-height: min(85vh, calc(var(--svh, 1vh) * 85)); }
         #training-modal.is-open #training-modal-panel { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Responsive modal sizing */
+        @media (max-width: 640px) {
+            #training-modal-overlay { padding: 0; }
+            #training-modal-panel { width: 100vw; height: calc(var(--svh, 1vh) * 100); max-height: calc(var(--svh, 1vh) * 100); border-radius: 0; }
+            .training-modal-header { position: sticky; top: 0; background: #fff; z-index: 10; }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #training-modal-panel { max-width: 42rem; }
+        }
+        @media (min-width: 1025px) {
+            #training-modal-panel { max-width: 56rem; }
+        }
 
         /* Toggle (details/summary) styling */
         details.toggle-card { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
@@ -587,7 +600,7 @@
             <div id="training-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
             <div id="training-modal-overlay" class="absolute inset-0 flex items-center justify-center p-4">
                 <div id="training-modal-panel" class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
-                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                    <div class="training-modal-header flex items-center justify-between px-6 py-4 border-b">
                         <h3 class="text-lg md:text-xl font-bold text-navy">AI研修の詳細</h3>
                         <button type="button" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" data-close-training-modal aria-label="閉じる">×</button>
                     </div>
@@ -845,6 +858,15 @@
             const trainingBackdrop = document.getElementById('training-modal-backdrop');
             const trainingOverlay = document.getElementById('training-modal-overlay');
             const trainingPanel = document.getElementById('training-modal-panel');
+
+            // iOS/Safari viewport height fix (sets --svh = 1% of innerHeight)
+            function setSVH() {
+                const svh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--svh', `${svh}px`);
+            }
+            setSVH();
+            window.addEventListener('resize', setSVH);
+            if (window.visualViewport) window.visualViewport.addEventListener('resize', setSVH);
 
             function openTrainingModal() {
                 if (!trainingModal) return;
