@@ -17,6 +17,8 @@
     <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
     <!-- three.js for Hero Animation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- highlight.js (for code blocks in Markdown) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
 
     <style>
         /* Custom Styles */
@@ -165,6 +167,106 @@
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
             outline: none;
         }
+
+        /* Training modal transitions */
+        #training-modal-backdrop { opacity: 0; transition: opacity 200ms ease; }
+        #training-modal.is-open #training-modal-backdrop { opacity: 1; }
+        #training-modal-panel { opacity: 0; transform: translateY(10px) scale(0.98); transition: opacity 220ms ease, transform 220ms ease; }
+        #training-modal.is-open #training-modal-panel { opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Toggle (details/summary) styling */
+        details.toggle-card { border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(2,6,23,0.06); }
+        details.toggle-card + details.toggle-card { margin-top: 14px; }
+        details.toggle-card[open] { box-shadow: 0 10px 24px rgba(2,6,23,0.08); border-color: #cbd5e1; }
+        summary.toggle-summary { list-style: none; cursor: pointer; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%); }
+        summary.toggle-summary::-webkit-details-marker { display: none; }
+        .ts-left { display:flex; align-items:center; gap:12px; min-width:0; }
+        .ts-title { color:#0a142f; font-weight: 700; }
+        .ts-sub { color:#475569; font-size: 12px; font-weight:600; background:#e2e8f0; padding:2px 8px; border-radius:999px; }
+        .ts-right { display:flex; align-items:center; gap:10px; }
+        .ts-badge { font-size: 11px; font-weight:700; color:#0369a1; background:#e0f2fe; border:1px solid #bae6fd; padding:4px 8px; border-radius:999px; }
+        .ts-chevron { transition: transform 200ms ease, color 200ms ease; color:#64748b; }
+        details[open] .ts-chevron { transform: rotate(180deg); color:#0ea5e9; }
+        .training-md-content { line-height: 1.7; color:#334155; }
+        .training-md-content h1, .training-md-content h2, .training-md-content h3 { color:#0a142f; margin: 1.2em 0 0.5em; font-weight:800; }
+        .training-md-content h1 { font-size:1.5rem; }
+        .training-md-content h2 { font-size:1.25rem; }
+        .training-md-content h3 { font-size:1.125rem; }
+        /* Cute heading styles */
+        .training-md-content h2,
+        .training-md-content h3 {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(180deg,#f0f9ff 0%, #e6f4ff 100%);
+            box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+        }
+        .training-md-content h2::before { content: '💡'; }
+        .training-md-content h3::before { content: '📌'; }
+        .training-md-content p { margin: 0.5em 0; }
+        .training-md-content ul { margin: 0.5em 0 0.5em 1.2em; list-style: disc; }
+        .training-md-content ol { margin: 0.5em 0 0.5em 1.2em; list-style: decimal; }
+        .training-md-content code { background:#f1f5f9; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.9em; }
+        .training-md-content table { width:100%; border-collapse: collapse; margin: 0.75em 0; }
+        .training-md-content th, .training-md-content td { border:1px solid #e2e8f0; padding:8px 10px; }
+        .training-md-content th { background:#f8fafc; text-align:left; }
+        .training-md-content tr:nth-child(even) { background:#f9fafb; }
+        .training-md-content a { color:#0369a1; text-decoration: underline; text-underline-offset: 2px; }
+        .training-md-content a:hover { color:#0ea5e9; }
+        .training-md-content blockquote { border-left:4px solid #0ea5e9; background:#f0f9ff; padding:12px 16px; border-radius:8px; margin: 0.75em 0; color:#0f172a; }
+        .training-md-content hr { border:0; border-top:1px solid #e2e8f0; margin: 1.25rem 0; }
+        .training-md-content img { max-width:100%; height:auto; border-radius:10px; box-shadow: 0 8px 24px rgba(2,6,23,0.12); margin: 0.5rem 0; }
+        .training-md-content pre { overflow-x:auto; border-radius:10px; border:1px solid #e2e8f0; }
+        /* Fade-in for loaded content */
+        .training-md-content { animation: mdFadeIn 220ms ease; }
+        @keyframes mdFadeIn { from { opacity:0; transform: translateY(4px);} to { opacity:1; transform: translateY(0);} }
+
+        /* Card style for top-level numbered items */
+        .training-md-content > ol { counter-reset: item; margin: 0.75em 0; padding-left: 0; }
+        .training-md-content > ol > li {
+            list-style: none;
+            counter-increment: item;
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 16px 16px 64px;
+            margin: 12px 0;
+            box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+        }
+        .training-md-content > ol > li::before {
+            content: counter(item);
+            position: absolute;
+            left: 16px;
+            top: 16px;
+            width: 36px; height: 36px;
+            border-radius: 9999px;
+            background: #0ea5e9;
+            color: #fff;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 16px rgba(14,165,233,0.35);
+        }
+        .training-md-content > ol > li h1,
+        .training-md-content > ol > li h2,
+        .training-md-content > ol > li h3 { margin-top: 0; }
+        .training-md-content > ol > li ul { margin-left: 1rem; }
+
+        /* Auto-generated training cards (from plain paragraphs) */
+        .training-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; box-shadow: 0 8px 22px rgba(2,6,23,0.08); padding: 16px; margin: 14px 0; }
+        .training-card .tc-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+        .training-card .tc-title { font-weight:800; color:#0a142f; display:flex; align-items:center; gap:10px; }
+        .training-card .tc-num { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; background:#0ea5e9; color:#fff; font-weight:800; box-shadow: 0 6px 16px rgba(14,165,233,0.35); }
+        .training-card .tc-meta { display:flex; align-items:center; gap:8px; }
+        .training-card .tc-badge { font-size:12px; font-weight:700; padding:4px 8px; border-radius:9999px; border:1px solid #bae6fd; background:#e0f2fe; color:#0369a1; white-space:nowrap; }
+        .training-card .tc-desc { color:#334155; margin: 6px 0 10px; }
+        .training-card .tc-list { margin: 8px 0 4px 0; padding-left: 1.1rem; }
+        .training-card .tc-list li { list-style: disc; margin: 6px 0; }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
@@ -293,7 +395,10 @@
                                     <div class="img-container rounded-t-xl"><img src="https://images.unsplash.com/photo-1513258496099-48168024aec0?q=80&w=800&auto=format&fit=crop" alt="AI研修" class="w-full rounded-t-xl"></div>
                                     <div class="p-8 text-left flex-grow flex flex-col">
                                         <h3 class="text-xl font-bold my-2 text-navy">AI研修</h3>
-                                        <p class="text-sm text-gray-700 flex-grow">全社員向けのリテラシー向上研修からエンジニア向けの専門研修まで、AIを使いこなす人材を育成します。</p>
+                                        <p class="text-sm text-gray-700">全社員向けのリテラシー向上研修からエンジニア向けの専門研修まで、AIを使いこなす人材を育成します。</p>
+                                        <div class="mt-4">
+                                            <button id="open-training-modal" class="bg-sky-500 text-white font-bold py-2.5 px-6 rounded-full text-sm hover:bg-sky-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-sky-500/40">詳細はこちら</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -476,6 +581,77 @@
             </div>
         </section>
     </main>
+
+        <!-- ===== AI Training Modal ===== -->
+        <div id="training-modal" class="fixed inset-0 hidden" aria-hidden="true">
+            <div id="training-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
+            <div id="training-modal-overlay" class="absolute inset-0 flex items-center justify-center p-4">
+                <div id="training-modal-panel" class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
+                    <div class="flex items-center justify-between px-6 py-4 border-b">
+                        <h3 class="text-lg md:text-xl font-bold text-navy">AI研修の詳細</h3>
+                        <button type="button" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" data-close-training-modal aria-label="閉じる">×</button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <details class="toggle-card" data-md-path="kensyu-ai-business.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-sky-600"><i class="fa-solid fa-briefcase"></i></span>
+                                    <span class="ts-title">AIビジネス基礎</span>
+                                    <span class="ts-sub">基礎〜応用</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">標準学生時間12h</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="toggle-card" data-md-path="kensyu-copilot.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-indigo-600"><i class="fa-solid fa-code"></i></span>
+                                    <span class="ts-title">Microsoft 365 Copilot</span>
+                                    <span class="ts-sub">開発効率化</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">標準学生時間5h</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="toggle-card" data-md-path="kensyu-notion.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-emerald-600"><i class="fa-solid fa-note-sticky"></i></span>
+                                    <span class="ts-title">Notion AI活用</span>
+                                    <span class="ts-sub">ナレッジ管理</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">標準学生時間5h</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                        <details class="toggle-card" data-md-path="kensyu-google-workspace-ai.md">
+                            <summary class="toggle-summary">
+                                <span class="ts-left">
+                                    <span class="ts-icon text-amber-600"><i class="fa-solid fa-envelope-open-text"></i></span>
+                                    <span class="ts-title">Google Workspace AI活用</span>
+                                    <span class="ts-sub">Docs/Sheets/Slides</span>
+                                </span>
+                                <span class="ts-right">
+                                    <span class="ts-badge">標準学生時間5h</span>
+                                    <i class="fa-solid fa-chevron-down ts-chevron"></i>
+                                </span>
+                            </summary>
+                            <div class="p-4 training-md-content"></div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!-- ===== Footer Section ===== -->
     <footer class="bg-gray-900 text-gray-400 py-12">
@@ -662,7 +838,229 @@
                 },
             });
 
-            
+            // --- AI Training Modal ---
+            const trainingModal = document.getElementById('training-modal');
+            const openTrainingBtn = document.getElementById('open-training-modal');
+            const closeTrainingBtn = trainingModal ? trainingModal.querySelector('[data-close-training-modal]') : null;
+            const trainingBackdrop = document.getElementById('training-modal-backdrop');
+            const trainingOverlay = document.getElementById('training-modal-overlay');
+            const trainingPanel = document.getElementById('training-modal-panel');
+
+            function openTrainingModal() {
+                if (!trainingModal) return;
+                trainingModal.classList.remove('hidden');
+                // allow next frame for transitions
+                requestAnimationFrame(() => trainingModal.classList.add('is-open'));
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeTrainingModal() {
+                if (!trainingModal) return;
+                trainingModal.classList.remove('is-open');
+                const onEnd = () => {
+                    trainingModal.classList.add('hidden');
+                    document.body.style.overflow = '';
+                    trainingModal.removeEventListener('transitionend', onEnd);
+                };
+                trainingModal.addEventListener('transitionend', onEnd);
+            }
+
+            if (openTrainingBtn) {
+                openTrainingBtn.addEventListener('click', openTrainingModal);
+            }
+            if (closeTrainingBtn) {
+                closeTrainingBtn.addEventListener('click', closeTrainingModal);
+            }
+            // Close on backdrop or outside-panel area
+            if (trainingBackdrop) trainingBackdrop.addEventListener('click', closeTrainingModal);
+            if (trainingOverlay) trainingOverlay.addEventListener('click', closeTrainingModal);
+            if (trainingPanel) trainingPanel.addEventListener('click', (e) => e.stopPropagation());
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeTrainingModal();
+            });
+
+            // Lazy-load and render Markdown on first expand
+            function loadMarked() {
+                return new Promise((resolve, reject) => {
+                    if (window.marked) return resolve(window.marked);
+                    const s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/marked/marked.min.js';
+                    s.onload = () => {
+                        try {
+                            window.marked.setOptions({ gfm: true, breaks: true, headerIds: true, mangle: false, smartypants: true });
+                        } catch (e) {}
+                        resolve(window.marked);
+                    };
+                    s.onerror = reject;
+                    document.head.appendChild(s);
+                });
+            }
+
+            function loadHLJS() {
+                return new Promise((resolve, reject) => {
+                    if (window.hljs) return resolve(window.hljs);
+                    const s = document.createElement('script');
+                    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js';
+                    s.onload = () => resolve(window.hljs);
+                    s.onerror = reject;
+                    document.head.appendChild(s);
+                });
+            }
+
+            function parseDurationStr(s) {
+                // Accept patterns like "1時間20分", "2時間", "45分", "1.5時間"
+                const m = s.trim().match(/^(?:(\d+(?:\.\d+)?)\s*時間)?\s*(\d+)?\s*分?$/);
+                if (!m) return null;
+                let hours = m[1] ? parseFloat(m[1]) : 0;
+                let minutes = m[2] ? parseInt(m[2], 10) : 0;
+                // Convert decimal hours to mins if provided
+                if (m[1] && String(m[1]).includes('.')) {
+                    minutes += Math.round((hours - Math.trunc(hours)) * 60);
+                    hours = Math.trunc(hours);
+                }
+                return { hours, minutes };
+            }
+
+            function fmtDuration(totalMin) {
+                const h = Math.floor(totalMin / 60);
+                const m = totalMin % 60;
+                if (h && m) return `${h}時間${m}分`;
+                if (h) return `${h}時間`;
+                return `${m}分`;
+            }
+
+            function autoBuildTrainingCards(container) {
+                // Build structured cards from paragraph-only content.
+                const paras = Array.from(container.querySelectorAll(':scope > p'));
+                if (paras.length < 3) return; // not our structure
+
+                const isNumberLine = (t) => /^\s*\d+\s*$/.test(t);
+                const isDurationLine = (t) => !!parseDurationStr(t);
+
+                const cards = [];
+                let i = 0; let seq = 0;
+                while (i < paras.length) {
+                    // find the start: number line or anything if first
+                    if (cards.length === 0 && !isNumberLine(paras[i].textContent)) {
+                        // start from beginning
+                    } else if (isNumberLine(paras[i].textContent)) {
+                        i++; // consume number line; number badge will come from count
+                    }
+                    seq += 1;
+                    // title
+                    if (i >= paras.length) break;
+                    const title = paras[i].textContent.trim();
+                    i++;
+                    // optional duration as next paragraph
+                    let totalMin = 0;
+                    if (i < paras.length && isDurationLine(paras[i].textContent)) {
+                        const d = parseDurationStr(paras[i].textContent);
+                        totalMin += (d.hours * 60 + d.minutes);
+                        i++;
+                    }
+                    // optional intro/desc if next para is not number or duration
+                    const bullets = [];
+                    let desc = '';
+                    while (i < paras.length && !isNumberLine(paras[i].textContent)) {
+                        const t = paras[i].textContent.trim();
+                        if (!t) { i++; continue; }
+                        const dur = parseDurationStr(t);
+                        if (dur) {
+                            totalMin += (dur.hours * 60 + dur.minutes);
+                        } else if (!desc) {
+                            // first non-duration line after title/duration → description
+                            desc = t;
+                        } else {
+                            bullets.push(t);
+                        }
+                        i++;
+                        // stop when next is number (start of next card) or we hit a heading element ahead
+                        if (i < paras.length && isNumberLine(paras[i].textContent)) break;
+                    }
+                    cards.push({ seq, title, desc, totalMin, bullets });
+                    // if next line is number, the while condition will break and continue
+                }
+
+                if (!cards.length) return;
+                // Clear and rebuild
+                container.innerHTML = '';
+                cards.forEach(c => {
+                    const card = document.createElement('div');
+                    card.className = 'training-card';
+                    const head = document.createElement('div');
+                    head.className = 'tc-head';
+                    const left = document.createElement('div');
+                    left.className = 'tc-title';
+                    const num = document.createElement('span');
+                    num.className = 'tc-num';
+                    num.textContent = c.seq;
+                    const title = document.createElement('span');
+                    title.textContent = c.title;
+                    left.appendChild(num);
+                    left.appendChild(title);
+                    head.appendChild(left);
+
+                    const meta = document.createElement('div');
+                    meta.className = 'tc-meta';
+                    if (c.totalMin) {
+                        const b = document.createElement('span');
+                        b.className = 'tc-badge';
+                        b.textContent = `標準学習時間 ${fmtDuration(c.totalMin)}`;
+                        meta.appendChild(b);
+                    }
+                    head.appendChild(meta);
+                    card.appendChild(head);
+
+                    if (c.desc) {
+                        const d = document.createElement('p');
+                        d.className = 'tc-desc';
+                        d.textContent = c.desc;
+                        card.appendChild(d);
+                    }
+                    if (c.bullets.length) {
+                        const ul = document.createElement('ul');
+                        ul.className = 'tc-list';
+                        c.bullets.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+                        card.appendChild(ul);
+                    }
+                    container.appendChild(card);
+                });
+            }
+
+            function postProcessMarkdown(container) {
+                // External links
+                container.querySelectorAll('a').forEach(a => {
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                });
+                // Syntax highlight
+                if (window.hljs) {
+                    container.querySelectorAll('pre code').forEach(el => window.hljs.highlightElement(el));
+                }
+                // Transform plain-paragraph training outlines into rich cards
+                autoBuildTrainingCards(container);
+            }
+
+            const mdDetails = Array.from(document.querySelectorAll('#training-modal details[data-md-path]'));
+            mdDetails.forEach((d) => {
+                d.addEventListener('toggle', async () => {
+                    if (!d.open || d.dataset.loaded) return;
+                    const path = d.getAttribute('data-md-path');
+                    const container = d.querySelector('.training-md-content');
+                    if (!path || !container) return;
+                    try {
+                        const res = await fetch(path);
+                        const text = await res.text();
+                        await loadMarked();
+                        await loadHLJS();
+                        container.innerHTML = window.marked.parse(text);
+                        postProcessMarkdown(container);
+                        d.dataset.loaded = '1';
+                    } catch (err) {
+                        container.innerHTML = '<p class="text-red-600">読み込みに失敗しました。</p>';
+                    }
+                });
+            });
         });
     </script>
 </body>
