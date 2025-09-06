@@ -192,6 +192,20 @@
         .training-md-content h1 { font-size:1.5rem; }
         .training-md-content h2 { font-size:1.25rem; }
         .training-md-content h3 { font-size:1.125rem; }
+        /* Cute heading styles */
+        .training-md-content h2,
+        .training-md-content h3 {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1px solid #bfdbfe;
+            background: linear-gradient(180deg,#f0f9ff 0%, #e6f4ff 100%);
+            box-shadow: 0 6px 18px rgba(2,6,23,0.06);
+        }
+        .training-md-content h2::before { content: '💡'; }
+        .training-md-content h3::before { content: '📌'; }
         .training-md-content p { margin: 0.5em 0; }
         .training-md-content ul { margin: 0.5em 0 0.5em 1.2em; list-style: disc; }
         .training-md-content ol { margin: 0.5em 0 0.5em 1.2em; list-style: decimal; }
@@ -571,7 +585,7 @@
         <!-- ===== AI Training Modal ===== -->
         <div id="training-modal" class="fixed inset-0 hidden" aria-hidden="true">
             <div id="training-modal-backdrop" class="absolute inset-0 bg-black/60"></div>
-            <div class="absolute inset-0 flex items-center justify-center p-4">
+            <div id="training-modal-overlay" class="absolute inset-0 flex items-center justify-center p-4">
                 <div id="training-modal-panel" class="bg-white rounded-xl w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl">
                     <div class="flex items-center justify-between px-6 py-4 border-b">
                         <h3 class="text-lg md:text-xl font-bold text-navy">AI研修の詳細</h3>
@@ -596,7 +610,7 @@
                             <summary class="toggle-summary">
                                 <span class="ts-left">
                                     <span class="ts-icon text-indigo-600"><i class="fa-solid fa-code"></i></span>
-                                    <span class="ts-title">GitHub Copilot活用</span>
+                                    <span class="ts-title">Microsoft 365 Copilot</span>
                                     <span class="ts-sub">開発効率化</span>
                                 </span>
                                 <span class="ts-right">
@@ -829,6 +843,8 @@
             const openTrainingBtn = document.getElementById('open-training-modal');
             const closeTrainingBtn = trainingModal ? trainingModal.querySelector('[data-close-training-modal]') : null;
             const trainingBackdrop = document.getElementById('training-modal-backdrop');
+            const trainingOverlay = document.getElementById('training-modal-overlay');
+            const trainingPanel = document.getElementById('training-modal-panel');
 
             function openTrainingModal() {
                 if (!trainingModal) return;
@@ -855,9 +871,10 @@
             if (closeTrainingBtn) {
                 closeTrainingBtn.addEventListener('click', closeTrainingModal);
             }
-            if (trainingBackdrop) {
-                trainingBackdrop.addEventListener('click', closeTrainingModal);
-            }
+            // Close on backdrop or outside-panel area
+            if (trainingBackdrop) trainingBackdrop.addEventListener('click', closeTrainingModal);
+            if (trainingOverlay) trainingOverlay.addEventListener('click', closeTrainingModal);
+            if (trainingPanel) trainingPanel.addEventListener('click', (e) => e.stopPropagation());
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeTrainingModal();
             });
